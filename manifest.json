@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.koenhendriks.menu-calculator",
+  "name": "Omarchy Menu Calculator Plugin",
+  "version": "1.0.0",
+  "author": "Koen Hendriks",
+  "description": "Answers arithmetic typed into the Omarchy menu search field and copies the result on Enter",
+  "kinds": [
+    "menu",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "menu": "Menu.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Omarchy Menu Calculator Plugin",
+    "description": "Launches the Omarchy menu",
+    "category": "Compositor",
+    "allowMultiple": false
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.menu"
+  }
+}
