@@ -94,10 +94,31 @@ from `$OMARCHY_PATH/shell/plugins/menu/Menu.qml` and adds three things to it:
 - an item `order` far below every real row, which is what keeps the answer on top
 - an override of `parentPathFor()`, so the row's second line shows the
   expression instead of the menu path a synthetic row hasn't got
+- an application list, because Omarchy does not give a third-party menu one
 
 Because the row is a real menu item, search, keyboard, pointer, and theming all
 treat it like any other row. The calculator stays out of `dmenu` mode
 (`omarchy-menu-select`) entirely — those rows belong to whoever opened the list.
+
+### The application list
+
+The stock menu reads its applications through `shell.appLibrary`, a capability
+the host hands to the plugin. Omarchy 4.0.3 builds that object for third-party
+plugins but leaves `appLibrary` null on it, and `mergeAppRows()` opens with
+`if (!root.appLibrary) return` — so a cloned menu has no applications at all:
+nothing in the Apps submenu, nothing in search, and nothing in the journal to
+say why. The stock menu is unaffected, because a first-party plugin is handed
+the shell itself.
+
+`AppLibraryShim.qml` rebuilds that capability out of what a plugin can reach:
+`DesktopEntries` for the entries, and the shell's own `AppSearch.js`,
+`hidden-entries.sh` and `launcher.hides` for identical ranking and identical
+`NoDisplay` / `OnlyShowIn` / `NotShowIn` filtering. `ShellWithAppLibrary.qml`
+carries it in, since `appLibrary` is readonly on the base but the `shell`
+property it reads from is not. The swap only happens when the host supplies no
+library of its own, so the day Omarchy starts providing one the plugin goes back
+to using it. The one thing not reproduced is the "Launching…" OSD, which needs
+host-only state; the launch itself is the same `gtk-launch` call.
 
 ## Requirements
 

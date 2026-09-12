@@ -15,6 +15,38 @@ import "Calculator.js" as Calculator
 Upstream.Menu {
   id: root
 
+  // Omarchy 4.0.3 hands a third-party menu a capability-scoped `shell` whose
+  // `appLibrary` is null, and `mergeAppRows()` opens with `if (!root.appLibrary)
+  // return` — so a cloned menu silently has no applications at all: nothing in
+  // the Apps submenu, nothing in search, and nothing in the journal to say so.
+  // The stock menu is unaffected because a first-party plugin is handed the
+  // shell itself. Swapping `shell` for a proxy that carries an appLibrary is
+  // the only way in from here: `appLibrary` is readonly on the base, but the
+  // property it is bound to is not.
+  //
+  // The swap is conditional, so the day the host starts providing one this
+  // stands aside and the plugin goes back to using it.
+  onShellChanged: root.adoptAppLibrary()
+
+  function adoptAppLibrary() {
+    var incoming = root.shell
+    if (!incoming || incoming === shellWithAppLibrary) return
+    if (incoming.appLibrary) return
+
+    shellWithAppLibrary.realShell = incoming
+    shellWithAppLibrary.appLibrary = appLibraryShim
+    // Re-enters onShellChanged, which returns at the identity check above.
+    root.shell = shellWithAppLibrary
+  }
+
+  AppLibraryShim {
+    id: appLibraryShim
+  }
+
+  ShellWithAppLibrary {
+    id: shellWithAppLibrary
+  }
+
   readonly property string calcRowId: "calc.result"
   // nf-md-calculator, from the same Material glyph range the shipped rows use.
   readonly property string calcIcon: "󰃬"
