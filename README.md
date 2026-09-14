@@ -1,14 +1,19 @@
 # Omarchy Menu Calculator Plugin
 
-Type a calculation into the Omarchy menu and the answer appears as the top row.
-`Enter` copies it to the clipboard.
+The calculator sleeps until the search text opens with `=`: that first character
+is the switch, and everything after it is the expression. Type `=` followed by a
+calculation into the Omarchy menu and the answer appears as the top row; `Enter`
+copies it to the clipboard.
 
 ![The Omarchy menu answering 4+4 with 8](preview.png)
 
+*(The screenshot predates the `=` gate: it shows the plugin answering `4+4` to
+illustrate the expression grammar. Today that answer appears for `=4+4`.)*
+
 Everything else about the menu stays exactly as Omarchy ships it. Anything that
-is not arithmetic — including a bare number like `42` — leaves the search
-results untouched, so `theme`, app names, and every existing route still behave
-the way you expect:
+does not open with `=` — arithmetic like `4+4`, a bare number like `42`, or a
+lone `=` with nothing after it — leaves the search results untouched, so
+`theme`, app names, and every existing route still behave the way you expect:
 
 ![Searching for "theme" returns the usual menu rows](docs/search-unchanged.png)
 
@@ -44,24 +49,28 @@ omarchy plugin remove io.github.koenhendriks.menu-calculator --yes
 
 ## Usage
 
-Open the menu (`SUPER`), type an expression, read the answer. `Enter` copies the
+Open the menu (`SUPER`), type `=` followed by an expression, read the answer.
+A lone `=` shows nothing until the expression follows it. `Enter` copies the
 result and sends a notification confirming it; `Escape` closes the menu as usual.
 
 ![The menu answering sqrt(144)+2^5 with 44](docs/expression.png)
 
+*(The screenshot predates the `=` gate: it illustrates the expression grammar.
+Today the same answer appears for `=sqrt(144)+2^5`.)*
+
 | Type this | Get this |
 |---|---|
-| `4+4`, `10-3`, `6*7`, `10/4` | `8`, `7`, `42`, `2.5` |
-| `1250*1.21` | `1512.5` |
-| `2^10`, `2**8` | `1024`, `256` |
-| `(2+3)*4` | `20` |
-| `10%3` | `1` — a `%` with an operand after it is a remainder |
-| `20%`, `50%*2` | `0.2`, `1` — a `%` with nothing after it is a percentage |
-| `sqrt(144)+2^5` | `44` |
-| `round(2.5)`, `min(3,9,2)` | `3`, `2` |
-| `pi*2`, `ln(e)` | `6.28318530718`, `1` |
-| `0x1f+1`, `0b1010*2`, `1e3+1` | `32`, `20`, `1001` |
-| `2×3`, `10÷4` | `6`, `2.5` |
+| `=4+4`, `=10-3`, `=6*7`, `=10/4` | `8`, `7`, `42`, `2.5` |
+| `=1250*1.21` | `1512.5` |
+| `=2^10`, `=2**8` | `1024`, `256` |
+| `=(2+3)*4` | `20` |
+| `=10%3` | `1` — a `%` with an operand after it is a remainder |
+| `=20%`, `=50%*2` | `0.2`, `1` — a `%` with nothing after it is a percentage |
+| `=sqrt(144)+2^5` | `44` |
+| `=round(2.5)`, `=min(3,9,2)` | `3`, `2` |
+| `=pi*2`, `=ln(e)` | `6.28318530718`, `1` |
+| `=0x1f+1`, `=0b1010*2`, `=1e3+1` | `32`, `20`, `1001` |
+| `=2×3`, `=10÷4` | `6`, `2.5` |
 
 **Operators** `+` `-` `*` `/` `%` `^` (or `**`), parentheses, unary minus, and
 the `×` `÷` `−` `·` symbols a calculator app puts on its keys.
@@ -90,7 +99,8 @@ knows numbers and math cannot be talked into running anything else.
 from `$OMARCHY_PATH/shell/plugins/menu/Menu.qml` and adds three things to it:
 
 - a watcher on the search text that injects a calculator row into the menu's
-  item tree, the same way the built-in apps provider injects applications
+  item tree once the search opens with `=`, the same way the built-in apps
+  provider injects applications
 - an item `order` far below every real row, which is what keeps the answer on top
 - an override of `parentPathFor()`, so the row's second line shows the
   expression instead of the menu path a synthetic row hasn't got
