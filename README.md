@@ -52,6 +52,8 @@ omarchy plugin remove io.github.koenhendriks.menu-calculator --yes
 Open the menu (`SUPER`), type `=` followed by an expression, read the answer.
 A lone `=` shows nothing until the expression follows it. `Enter` copies the
 result and sends a notification confirming it; `Escape` closes the menu as usual.
+The answer appears only at the top level of the menu — inside a submenu the
+calculator row stays hidden, so typing `=` there produces no answer.
 
 ![The menu answering sqrt(144)+2^5 with 44](docs/expression.png)
 

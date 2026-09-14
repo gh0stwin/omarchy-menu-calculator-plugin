@@ -61,6 +61,11 @@ Upstream.Menu {
   // is in the tree by the time the search runs over it.
   onFilterTextChanged: root.syncCalcRow()
 
+  // Drilling into a submenu and back out re-runs the same sync: the row is
+  // taken out the moment the menu leaves the root, and can only reappear
+  // once the menu is back at the top.
+  onActiveMenuChanged: root.syncCalcRow()
+
   // A search row takes its second line from the path of the menu it lives in.
   // A row conjured out of the search field has no such path, so it gets the
   // expression instead — "=3+2" under the answer.
@@ -124,7 +129,13 @@ Upstream.Menu {
     var order = Array.isArray(root.itemOrder) ? root.itemOrder : []
     var present = !!items[root.calcRowId]
 
-    if (!result) {
+    // Top-menu-only is the accepted design: the row is parented at "root" and
+    // the stock menu surfaces only rows descended from the active menu, so the
+    // calculator answers at the top of the menu and nowhere else. The plugin
+    // enforces that itself instead of leaning on the host's descendant filter:
+    // away from the root the row is never injected, and one already standing
+    // is taken back out — whatever the query says.
+    if (!result || root.activeMenu !== "root") {
       if (!present) return
       var pruned = ({})
       for (var id in items) {
