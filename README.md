@@ -86,8 +86,12 @@ octal (`0o17`). Commas separate function arguments, so `min(1,2)` works but
 `1,000+5` does not.
 
 Results carry twelve significant digits, which is enough that `0.1+0.2` reads as
-`0.3`. Anything that is not a finite number — `1/0`, `1e309*2` — produces no row
-at all rather than a row saying `Infinity`.
+`0.3`. Rounding is a display rule, never a change of answer: whole-number
+answers are shown digit for digit — `1000000000000+1` reads `1000000000001` —
+out to 2^53, the last whole number every double represents; fractions keep the
+twelve-digit rounding. Answers of magnitude 1e15 or larger, or below 1e-9,
+print in exponential notation. Anything that is not a finite number — `1/0`,
+`1e309*2` — produces no row at all rather than a row saying `Infinity`.
 
 ## How it works
 

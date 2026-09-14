@@ -298,18 +298,25 @@ function trimExponent(text) {
 
 // Twelve significant digits is where binary floats stop agreeing with the
 // arithmetic people expect (0.1 + 0.2 reads as 0.3), and still far more
-// precision than a menu row is ever asked for.
+// precision than a menu row is ever asked for. Rounding stays a display rule
+// and never changes the answer: whole numbers climb until the printed digits
+// are the computed value itself — seventeen significant digits round-trip any
+// IEEE double — while fractions keep the twelve-digit look.
 function formatValue(value) {
   if (typeof value !== "number" || !isFinite(value)) return null
 
-  var rounded = Number(value.toPrecision(12))
+  var p = 12
+  if (Number.isInteger(value)) {
+    while (p < 17 && Number(value.toPrecision(p)) !== value) p++
+  }
+  var rounded = Number(value.toPrecision(p))
   if (rounded === 0) return "0"
 
   var magnitude = Math.abs(rounded)
-  if (magnitude >= 1e15 || magnitude < 1e-9) return trimExponent(rounded.toExponential(6))
+  if (magnitude >= 1e15 || magnitude < 1e-9) return trimExponent(rounded.toExponential(Math.max(p - 1, 6)))
 
   var text = String(rounded)
-  return text.indexOf("e") >= 0 ? trimExponent(rounded.toExponential(6)) : text
+  return text.indexOf("e") >= 0 ? trimExponent(rounded.toExponential(Math.max(p - 1, 6))) : text
 }
 
 // ------------------------------------------------------------------- public
