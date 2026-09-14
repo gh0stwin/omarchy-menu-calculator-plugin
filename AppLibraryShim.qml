@@ -5,19 +5,24 @@ import qs.Commons
 import "file:///usr/share/omarchy/shell/services/AppSearch.js" as AppSearch
 
 // Stand-in for the shell's own AppLibrary, for when the host does not hand one
-// over. Omarchy 4.0.3 builds a capability-scoped `shell` object for third-party
-// plugins and leaves `appLibrary` null on it, so `Upstream.Menu.mergeAppRows()`
-// returns before it adds a single row: no applications in the Apps submenu and
-// none in search, with nothing logged to say why. A menu without its
-// applications is not the menu, so this rebuilds that capability out of the
-// pieces a plugin *can* reach.
+// over. Omarchy 4.0.0–4.0.2 (everything before v4.0.3) build a scoped `shell`
+// object for third-party plugins and leave `appLibrary` null on it, so
+// `Upstream.Menu.mergeAppRows()` returns before it adds a single row: no
+// applications in the Apps submenu and none in search, with nothing logged to
+// say why. A menu without its applications is not the menu, so this rebuilds
+// that capability out of the pieces a plugin *can* reach. From v4.0.3 the host
+// hands third-party menu plugins a working app library, so there the swap
+// stands aside and this shim sits dormant.
 //
 // DesktopEntries is a Quickshell singleton and is readable from here directly.
 // Everything else is deliberately the shell's own: AppSearch.js for identical
 // ranking, hidden-entries.sh for the same NoDisplay/OnlyShowIn/NotShowIn
 // filtering, and launcher.hides for the same user hides. The one thing not
-// reproduced is the "Launching…" OSD, which needs host-only state; the launch
-// itself is the same gtk-launch call the shell makes.
+// reproduced is the "Launching…" OSD, which needs host-only state — a caveat
+// only where this shim runs (before v4.0.3): there no OSD appears on launch,
+// while from v4.0.3 the launch goes through the host facade and the OSD
+// appears. Either way the launch itself is the same gtk-launch call the shell
+// makes.
 Item {
     id: shim
 

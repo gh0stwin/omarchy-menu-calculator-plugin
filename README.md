@@ -68,6 +68,8 @@ Today the same answer appears for `=sqrt(144)+2^5`.)*
 | `=(2+3)*4` | `20` |
 | `=10%3` | `1` — a `%` with an operand after it is a remainder |
 | `=20%`, `=50%*2` | `0.2`, `1` — a `%` with nothing after it is a percentage |
+| `=20%+5`, `=50%-3` | `0`, `2` — a `%` followed by `+` or `-` is always a remainder (`20 % +5`, `50 % -3`), and spacing does not disambiguate |
+| `=200%10%` | `0.1` — parsed as `200 % (10%)`: the second `%` is a percentage inside the remainder's right operand |
 | `=sqrt(144)+2^5` | `44` |
 | `=round(2.5)`, `=min(3,9,2)` | `3`, `2` |
 | `=pi*2`, `=ln(e)` | `6.28318530718`, `1` |
@@ -98,7 +100,7 @@ at all rather than a row saying `Infinity`.
 knows numbers and math cannot be talked into running anything else.
 
 `Menu.qml` is not a fork of the Omarchy menu. It instantiates the stock menu
-from `$OMARCHY_PATH/shell/plugins/menu/Menu.qml` and adds three things to it:
+from `$OMARCHY_PATH/shell/plugins/menu/Menu.qml` and adds four things to it:
 
 - a watcher on the search text that injects a calculator row into the menu's
   item tree once the search opens with `=`, the same way the built-in apps
@@ -106,7 +108,7 @@ from `$OMARCHY_PATH/shell/plugins/menu/Menu.qml` and adds three things to it:
 - an item `order` far below every real row, which is what keeps the answer on top
 - an override of `parentPathFor()`, so the row's second line shows the
   expression instead of the menu path a synthetic row hasn't got
-- an application list, because Omarchy does not give a third-party menu one
+- an application list, because Omarchy before v4.0.3 does not hand a third-party menu one
 
 Because the row is a real menu item, search, keyboard, pointer, and theming all
 treat it like any other row. The calculator stays out of `dmenu` mode
@@ -115,12 +117,15 @@ treat it like any other row. The calculator stays out of `dmenu` mode
 ### The application list
 
 The stock menu reads its applications through `shell.appLibrary`, a capability
-the host hands to the plugin. Omarchy 4.0.3 builds that object for third-party
-plugins but leaves `appLibrary` null on it, and `mergeAppRows()` opens with
-`if (!root.appLibrary) return` — so a cloned menu has no applications at all:
-nothing in the Apps submenu, nothing in search, and nothing in the journal to
-say why. The stock menu is unaffected, because a first-party plugin is handed
-the shell itself.
+the host hands to the plugin. On Omarchy 4.0.0–4.0.2 the host builds a scoped
+`shell` object for third-party plugins but leaves `appLibrary` null on it, and
+`mergeAppRows()` opens with `if (!root.appLibrary) return` — so on those
+versions a cloned menu has no applications at all: nothing in the Apps
+submenu, nothing in search, and nothing in the journal to say why. The stock
+menu is unaffected, because a first-party plugin is handed the shell itself.
+From v4.0.3 the host hands third-party menu plugins a working app library, so
+there the shim below never engages and the plugin uses the host's library
+directly.
 
 `AppLibraryShim.qml` rebuilds that capability out of what a plugin can reach:
 `DesktopEntries` for the entries, and the shell's own `AppSearch.js`,
@@ -128,9 +133,12 @@ the shell itself.
 `NoDisplay` / `OnlyShowIn` / `NotShowIn` filtering. `ShellWithAppLibrary.qml`
 carries it in, since `appLibrary` is readonly on the base but the `shell`
 property it reads from is not. The swap only happens when the host supplies no
-library of its own, so the day Omarchy starts providing one the plugin goes back
-to using it. The one thing not reproduced is the "Launching…" OSD, which needs
-host-only state; the launch itself is the same `gtk-launch` call.
+library of its own, so from v4.0.3 on the plugin goes back to using it and the
+shim never engages. The one thing not reproduced is the "Launching…" OSD,
+which needs host-only state — a caveat only where the shim runs (before
+v4.0.3): on those versions no OSD appears on launch, while from v4.0.3 the
+launch goes through the host facade and the OSD appears. The launch itself is
+the same `gtk-launch` call either way.
 
 ## Requirements
 
@@ -140,10 +148,12 @@ clipboard, `omarchy-notification-send` for the confirmation); there are no
 external dependencies to install.
 
 One caveat: the import of the stock menu is a literal
-`file:///usr/share/omarchy/shell/plugins/menu`, because a QML import path cannot
-be built from an environment variable at runtime. That is the packaged
-`$OMARCHY_PATH`. An Omarchy installed somewhere else needs that line changed in
-`Menu.qml` and `BarWidget.qml`.
+`file:///usr/share/omarchy/shell/plugins/menu`, because a QML import path
+cannot be built from an environment variable at runtime. That is the packaged
+`$OMARCHY_PATH`. An Omarchy installed somewhere else needs it changed in
+`Menu.qml` and `BarWidget.qml` — both carry that line — and in
+`AppLibraryShim.qml`, which imports the shell's `AppSearch.js` through the
+same literal `file:///usr/share/omarchy` path.
 
 ## Hacking on it
 

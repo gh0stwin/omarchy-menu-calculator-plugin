@@ -17,17 +17,20 @@ import "Calculator.js" as Calculator
 Upstream.Menu {
   id: root
 
-  // Omarchy 4.0.3 hands a third-party menu a capability-scoped `shell` whose
-  // `appLibrary` is null, and `mergeAppRows()` opens with `if (!root.appLibrary)
-  // return` — so a cloned menu silently has no applications at all: nothing in
-  // the Apps submenu, nothing in search, and nothing in the journal to say so.
-  // The stock menu is unaffected because a first-party plugin is handed the
-  // shell itself. Swapping `shell` for a proxy that carries an appLibrary is
-  // the only way in from here: `appLibrary` is readonly on the base, but the
-  // property it is bound to is not.
+  // Omarchy 4.0.0–4.0.2 (everything before v4.0.3) hands a third-party menu a
+  // capability-scoped `shell` whose `appLibrary` is null, and `mergeAppRows()`
+  // opens with `if (!root.appLibrary) return` — so on those versions a cloned
+  // menu silently has no applications at all: nothing in the Apps submenu,
+  // nothing in search, and nothing in the journal to say so. The stock menu is
+  // unaffected because a first-party plugin is handed the shell itself. From
+  // v4.0.3 the host hands third-party menu plugins a working app library.
+  // Swapping `shell` for a proxy that carries an appLibrary is the only way in
+  // from here: `appLibrary` is readonly on the base, but the property it is
+  // bound to is not.
   //
-  // The swap is conditional, so the day the host starts providing one this
-  // stands aside and the plugin goes back to using it.
+  // The swap is conditional, so when the host supplies a working library — as
+  // v4.0.3 and later do — this stands aside and the plugin goes back to using
+  // it.
   onShellChanged: root.adoptAppLibrary()
 
   function adoptAppLibrary() {
