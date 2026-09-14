@@ -98,7 +98,7 @@ at all rather than a row saying `Infinity`.
 knows numbers and math cannot be talked into running anything else.
 
 `Menu.qml` is not a fork of the Omarchy menu. It instantiates the stock menu
-from `$OMARCHY_PATH/shell/plugins/menu/Menu.qml` and adds three things to it:
+from `$OMARCHY_PATH/shell/plugins/menu/Menu.qml` and adds four things to it:
 
 - a watcher on the search text that injects a calculator row into the menu's
   item tree once the search opens with `=`, the same way the built-in apps
@@ -106,7 +106,7 @@ from `$OMARCHY_PATH/shell/plugins/menu/Menu.qml` and adds three things to it:
 - an item `order` far below every real row, which is what keeps the answer on top
 - an override of `parentPathFor()`, so the row's second line shows the
   expression instead of the menu path a synthetic row hasn't got
-- an application list, because Omarchy does not give a third-party menu one
+- an application list, because Omarchy before v4.0.3 does not hand a third-party menu one
 
 Because the row is a real menu item, search, keyboard, pointer, and theming all
 treat it like any other row. The calculator stays out of `dmenu` mode
