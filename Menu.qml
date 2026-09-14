@@ -93,7 +93,7 @@ Upstream.Menu {
       // description, and the words of the query are always words of the query
       // itself — so the row survives whatever the user types, including
       // expressions with no letters in them for the name match to catch.
-      description: String(result.expression).toLowerCase(),
+      description: ("=" + result.expression).toLowerCase(),
       action: root.calcAction(result),
       provider: "",
       aliases: [],
