@@ -49,7 +49,11 @@ Upstream.Menu {
     id: shellWithAppLibrary
   }
 
-  readonly property string calcRowId: "calc.result"
+  // Namespaced so a user's own omarchy-menu.jsonc item can never collide with
+  // it: the id is opaque and invisible — the row's label and description are
+  // what the user sees — but the injection and its cleanup operate on the
+  // item map, and an un-namespaced id could clobber or delete a user row.
+  readonly property string calcRowId: "io.github.koenhendriks.menu-calculator.result"
   // nf-md-calculator, from the same Material glyph range the shipped rows use.
   readonly property string calcIcon: "󰃬"
   // Rows are sorted by score, and score has the item's order added to it.
