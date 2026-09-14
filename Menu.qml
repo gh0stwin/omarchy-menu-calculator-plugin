@@ -3,9 +3,11 @@ import qs.Commons
 import "file:///usr/share/omarchy/shell/plugins/menu" as Upstream
 import "Calculator.js" as Calculator
 
-// The Omarchy menu, plus one row it does not ship with: type an expression
-// into the search field and the answer appears above the results, with the
-// expression under it. Enter copies the answer.
+// The Omarchy menu, plus one row it does not ship with: open the search with
+// '=' and everything after that first character is evaluated as an expression,
+// with the answer appearing above the results and the expression under it.
+// Enter copies the answer. Without the leading '=' the calculator sleeps and
+// the menu is the stock one.
 //
 // This is the stock menu, not a fork of it — `Upstream.Menu` is the menu that
 // ships with Omarchy, and everything below is the calculator bolted onto it.
@@ -91,7 +93,7 @@ Upstream.Menu {
       // description, and the words of the query are always words of the query
       // itself — so the row survives whatever the user types, including
       // expressions with no letters in them for the name match to catch.
-      description: String(result.expression).toLowerCase(),
+      description: ("=" + result.expression).toLowerCase(),
       action: root.calcAction(result),
       provider: "",
       aliases: [],
@@ -109,7 +111,15 @@ Upstream.Menu {
     // A dmenu (`omarchy-menu-select`) is someone else's list of options being
     // filtered, not the Omarchy menu being searched. Answer nothing into it,
     // and take the row back out if one was standing when it opened.
-    var result = root.dmenuActive ? null : Calculator.evaluate(root.filterText)
+    //
+    // The calculator stays dormant until the search opens with '=': that first
+    // character is the switch, and everything after it is the expression. Any
+    // other first character — a digit, a letter, another operator, a leading
+    // space — leaves the menu exactly as Omarchy built it, so "4+4" stays a
+    // search and only "=4+4" gets an answer. A lone '=' activates nothing by
+    // itself: evaluate() finds no expression after it and answers null.
+    var activated = !root.dmenuActive && root.filterText.charAt(0) === "="
+    var result = activated ? Calculator.evaluate(root.filterText.substring(1)) : null
     var items = root.items || ({})
     var order = Array.isArray(root.itemOrder) ? root.itemOrder : []
     var present = !!items[root.calcRowId]

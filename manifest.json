@@ -4,7 +4,7 @@
   "name": "Omarchy Menu Calculator Plugin",
   "version": "1.1.0",
   "author": "Koen Hendriks",
-  "description": "Answers arithmetic typed into the Omarchy menu search field and copies the result on Enter",
+  "description": "Answers arithmetic typed after '=' in the Omarchy menu search field and copies the result on Enter",
   "kinds": [
     "menu",
     "bar-widget"
