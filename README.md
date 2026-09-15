@@ -20,11 +20,11 @@ lone `=` with nothing after it — leaves the search results untouched, so
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/koenhendriks/omarchy-menu-calculator-plugin.git --enable --yes
+omarchy plugin add https://github.com/gh0stwin/omarchy-menu-calculator-plugin.git --enable --yes
 ```
 
 That clones the plugin to
-`~/.config/omarchy/plugins/io.github.koenhendriks.menu-calculator/` and enables
+`~/.config/omarchy/plugins/io.github.gh0stwin.menu-calculator/` and enables
 it. Nothing else on your system is touched: no config file is rewritten, no
 keybinding is changed, and no file outside that directory is created.
 
@@ -32,19 +32,19 @@ Enabling the plugin makes it stand in for the built-in `omarchy.menu`, so the
 `SUPER` keybind, the Omarchy button on the bar, `omarchy menu`, and every script
 that summons the menu all reach it automatically — there is nothing to rebind.
 
-Update later with `omarchy plugin update io.github.koenhendriks.menu-calculator`.
+Update later with `omarchy plugin update io.github.gh0stwin.menu-calculator`.
 
 ## Remove
 
 ```bash
-omarchy plugin disable io.github.koenhendriks.menu-calculator
+omarchy plugin disable io.github.gh0stwin.menu-calculator
 ```
 
 Disabling restores the built-in Omarchy menu and puts its bar button back where
 it was. To delete the files as well:
 
 ```bash
-omarchy plugin remove io.github.koenhendriks.menu-calculator --yes
+omarchy plugin remove io.github.gh0stwin.menu-calculator --yes
 ```
 
 ## Usage
